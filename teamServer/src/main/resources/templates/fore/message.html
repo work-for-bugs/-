@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>
+			消息
+		</title>
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+		<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+	</head>
+	<body>
+		<div id="bg" class="jumbotron jumbotron-fluid">
+			<div class="container">
+				<h1>崴崴？来组队！</h1>
+			</div>
+		</div>
+		<div id="app" class="container" align="center">
+			<h2 class="text-primary">我的消息</h1>
+			
+			<hr>
+			<br>	
+			<table class="table table-striped">
+				<tr>
+					<td>编号</td>
+					<td>团队名称</td>
+					<td>申请者</td>
+					<td>审核</td>
+					<td>已阅</td>
+				</tr>
+				<tr v-for="message in messageList">
+					<td>{{message.messageId}}</td>
+					<td>{{message.teamName}}</td>
+					<td>{{message.sendUserName}}</td>
+					<td>
+						<button class = "btn btn-success" 
+						v-on:click="agree(message.messageId)"  v-if="message.examine == '1'">
+							通过
+						</button>
+						<button class = "btn btn-danger" 
+						v-on:click="disagree(message.messageId)"  v-if="message.examine == '1'">
+							拒绝
+						</button>
+					</td>
+					<td>
+						<button class = "btn btn-info" 
+						v-on:click="read(message.messageId)"  v-if="message.examine == '0'">
+							已阅
+						</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</body>
+	<!-- <script src="vue.js"></script> -->
+	<!-- <script src="axios.min.js"></script> -->
+	<!-- <script src="const.js"></script> -->
+	<script src="../../js/vue.js"></script>
+	<script src="../../js/axios.min.js"></script>
+	<script src="../../js/const.js"></script>
+	<script>
+		var config={
+			"el":"#app",
+			"data":{
+				"team":[],
+				"receiveUserId":"",
+				"messageList":[],
+				"message":[],
+				"teamId":"",
+				"remainNum":""
+			},
+			"methods":{
+				"agree":function(id){
+					var url=serverUrl+"/message/update?handleState=1&messageId=" + id + "&result=1"
+					axios.get(url)
+					.then(function(response){
+						window.alert(response.data.msg)
+						console.log(this.vue.receiveUserId)
+						this.vue.selectByReceiveId(this.vue.receiveUserId);
+						this.vue.selectMessage(id)
+					})
+					.catch(function(e){
+						// console.log("联网出错了")
+					})
+				},
+				"disagree":function(id){
+					var url=serverUrl+"/message/update?handleState=1&messageId=" + id + "&result=0"
+					axios.get(url)
+					.then(function(response){
+						window.alert(response.data.msg)
+						console.log(this.vue.receiveUserId)
+						this.vue.selectByReceiveId(this.vue.receiveUserId);
+					})
+					.catch(function(e){
+						// console.log("联网出错了")
+					})
+				},
+				"read":function(id){
+					var url=serverUrl+"/message/update?handleState=1&messageId=" + id + "&result=1"
+					axios.get(url)
+					.then(function(response){
+						window.alert(response.data.msg)
+						// console.log(this.vue.receiveUserId)
+						this.vue.selectByReceiveId(this.vue.receiveUserId);
+						// console.log("messageId:" + id)
+						this.vue.selectMessage(id)
+					})
+					.catch(function(e){
+						// console.log("联网出错了")
+					})
+				},
+				"selectByReceiveId":function(id){		
+					var url=serverUrl+"/message/selectByReceiveId?id="+id
+					axios.get(url)
+					.then(function(response){
+						var serverResult=response.data
+						var messageList=serverResult.data
+						this.vue.messageList=messageList
+					})
+					.catch(function(e){
+						console.log("联网出错了")
+					})
+				},
+				"selectMessage":function(id){
+					var url = serverUrl+"/message/selectById?id=" + id
+					axios.get(url)
+					.then(function(response){
+						var serverResult=response.data
+						var message=serverResult.data
+						this.vue.message=message
+						// console.log(this.vue.message.teamId)
+						this.vue.teamId = this.vue.message.teamId
+						// console.log(this.vue.teamId)
+						this.vue.selectTeam(this.vue.teamId)
+					})
+					.catch(function(e){
+						console.log("联网出错了")
+					})
+				},
+				"selectTeam":function(id){
+					var url=serverUrl+"/team/selectById?id=" + id
+					axios.get(url)
+					.then(function(response){
+						var serverResult=response.data
+						var team=serverResult.data
+						this.vue.team=team
+						// console.log(this.vue.team.teamId)
+						this.vue.remainNum = this.vue.team.remainNum
+						// console.log(this.vue.remainNum)
+						this.vue.updateTeam(this.vue.teamId)
+					})
+					.catch(function(e){
+						console.log("联网出错了")
+					})
+				},
+				"updateTeam":function(id){
+					var newRemainNum = this.remainNum - 1
+					var url=serverUrl+"/team/update?remainNum=" + newRemainNum + "&teamId=" + id
+					axios.get(url)
+					.then(function(response){
+						var serverResult=response.data
+						var boolResult=serverResult.msg
+						console.log(boolResult)
+						window.alert("组队信息修改成功")
+					})
+					.catch(function(e){
+						console.log("联网出错了")
+					})
+				}
+			},
+			"mounted":function(){
+				var p=location.search
+				var array=p.split("=")
+				this.receiveUserId=array[1]
+				
+				var url=serverUrl+"/message/selectByReceiveId?id="+this.receiveUserId
+				axios.get(url)
+				.then(function(response){
+					var serverResult=response.data
+					var messageList=serverResult.data
+					this.vue.messageList=messageList
+				})
+				.catch(function(e){
+					console.log("联网出错了")
+				})
+			}
+			
+		}
+		var vue=new Vue(config)
+	</script>
+</html>

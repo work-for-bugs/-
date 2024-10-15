@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <!--使用X-UA-Compatible来设置IE浏览器兼容模式 最新的渲染模式-->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!--
+       viewport表示用户是否可以缩放页面；
+       width指定视区的逻辑宽度；
+       device-width指示视区宽度应为设备的屏幕宽度；
+       initial-scale指令用于设置Web页面的初始缩放比例
+       initial-scale=1则将显示未经缩放的Web文档
+    -->
+    <title>活动详情</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 引入 Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <style>
+        #bg {
+            background-image: url("images/head.jpg");
+            background-size: cover;
+        }
+        #end {
+            font-size: 18px;
+            text-align: center;
+            background-color: darkgray;
+        }
+    </style>
+</head>
+<body>
+    <div id="bg" class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1>崴崴？来组队！</h1>
+        </div>
+    </div>
+    <div id="app" class="container">
+        <h2 class="text-primary">活动详情</h2>
+        <br>
+		<hr>
+        <br>
+		<div class="row">
+		    <div class="col-md-4">
+		        <img src="../../img/2.jpg" class="rounded-circle img-fluid">
+		    </div>
+			<div class="col-md-5">
+			<h1 align="center">{{team.activityName}}</h1>
+            <br>
+            <hr>
+            <p class="lead" align="center">{{team.activityDescription}}</p>
+			</div>
+		</div>
+        <br>
+		<hr>
+        <br>
+        <h2 class="text-primary">基本信息</h2>
+        <br>
+		<hr>
+        <br>
+        <div class="col-md-12">
+            <ul class="list-group">
+                <li class="list-group-item">负责人：{{team.userId}}</li>
+                <li class="list-group-item">总名额：{{team.totalNum}}</li>
+                <li class="list-group-item">剩余名额：{{team.remainNum}}</li>
+                <li class="list-group-item">截止时间：{{team.endTime}}</li>
+            </ul>
+        </div>
+        <div class="container">
+            <br>
+            <hr>
+            <br>
+            <h2 class="text-primary">详细要求</h2>
+            <br>
+            <hr>
+            <br>
+            <div class="col-md-12">
+                <ul class="list-group">
+                    <li class="list-group-item">{{team.request}}</li>
+                </ul>
+            </div>
+        </div>
+        <footer id="end" class="mt-3 p-3">
+            <p class="text-white">我草你吗隔壁的软件实训，两天精通vue <a href="interface.html">返回首页</a></p>
+        </footer>
+    </div>
+</body>
+<script src="../../js/vue.js"></script>
+<script src="../../js/axios.min.js"></script>
+<script src="../../js/const.js"></script>
+<script>
+    var config={
+        "el":"#app",
+        "data":{"team":{}},
+        "mounted":function ()
+        {
+            //itemDetail.heml?id=1
+            var p=location.search//?id=1
+            var array=p.split("=")//[0]=?id [1]=1
+            var id=array[1]
+            console.log(id)
+
+            //联网
+            var url = serverUrl+"/team/selectById?id="+id
+            axios.get(url)
+                .then(function(response){
+                    var serverResult=response.data
+                    var team=serverResult.data
+                    this.vue.team=team
+                    console.log(team)
+                })
+                .catch()
+        }
+    }
+
+    var vue = new Vue(config)
+</script>
+</html>

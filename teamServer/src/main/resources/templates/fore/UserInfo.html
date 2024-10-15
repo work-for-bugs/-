@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+ 
+<head>
+    <meta charset="utf-8">
+    <title>个人简介</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+    <style>
+        #bg {
+            background-image: url("images/head.jpg");
+            background-size: cover;
+        }
+        #end {
+            font-size: 18px;
+            text-align: center;
+            background-color: darkgray;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div id="bg" class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1>个人信息</h1>
+        </div>
+    </div>
+    <br><br>
+    <div id="app-info" class="container">
+        <h2 class="text-primary">基本信息</h2>
+		<hr>
+		<div class="row">
+		    <div class="col-md-4">
+		        <img src="../../img/2.jpg" class="rounded-circle img-fluid">
+		    </div>
+			<div class="col-md-5">
+			<p class="lead"></p>
+			<p class="lead text-center">{{info.signature}}</p>
+			</div>
+		</div>
+        <hr>
+        <div class="col-md-9">
+            <ul class="list-group">
+                <li class="list-group-item">姓名：{{info.userName}}</li>
+                <li class="list-group-item">性别：{{info.gender}}</li>
+                <li class="list-group-item">年龄：{{info.age}}</li>
+                <li class="list-group-item">个人描述：{{info.userDescription}}</li>
+            </ul>
+        </div>
+    </div>
+    <br><br>
+    <hr>
+    <br>
+    <div id="app" class="container mt-3">
+        <h2 class="text-primary">我的活动</h2>
+        <hr>
+        <div class="row">
+            <div class="col-md-6">
+                <h4 class="text-secondary">
+                    我参加的
+                </h4>
+                <ul v-for="joinTeam in UserJoinTeamList" class="list-group">
+                    <li class="list-group-item"><a v-bind:href="'TeamDetail.html?teamId='+joinTeam.teamId">{{joinTeam.teamName}}</a></li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h4 class="text-secondary">
+                    我发起的
+                </h4>
+                <ul v-for="launchTeam in UserLaunchTeamList" class="list-group">
+                    <li class="list-group-item"><a v-bind:href="'TeamDetail.html?teamId='+launchTeam.teamId">{{launchTeam.teamName}}</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <br /><br />
+
+    <br>
+    <footer id="end" class="mt-3 p-3">
+        <p class="text-white">我草你吗隔壁的软件实训，两天精通vue <a href="interface.html">返回首页</a></p>
+    </footer>
+</div>
+</body>
+	<script src="../../js/vue.js"></script>
+	<script src="../../js/axios.min.js"></script>
+	<script src="../../js/const.js"></script>
+	<script type="text/javascript">
+		var config={
+			"el":"#app",
+			"data":{
+				"userId":0,
+				"img":"../../img/2.jpg",
+				"info":[],
+				"UserLaunchTeamList":[],
+				"UserJoinTeamList":[],
+				"selectedTeamId":0
+			},
+			"methods":{
+				"selectByTeamId":function(teamId){
+					var url=serverUrl+"/team/selectById?id="+teamId
+					axios.get(url)
+					.then(function(response){
+						console.log(response.data.data)
+						this.vue.UserLaunchTeamInfo = response.data.data
+					})
+					.catch()
+				},
+				"getUserLaunchTeam":function(userId){
+					var url=serverUrl+"/userTeamRelation/selectLaunch?id="+userId
+					axios.get(url)
+					.then(function(response){
+						console.log(response.data.data)
+						this.vue.UserLaunchTeamList = response.data.data
+					})
+					.catch()
+				},
+				"getUserJoinTeam":function(userId){
+					var url=serverUrl+"/userTeamRelation/selectJoin?id="+userId
+					axios.get(url)
+					.then(function(response){
+						console.log(response.data.data)
+						this.vue.UserJoinTeamList = response.data.data
+					})
+					.catch()
+				},
+				"getUserInfo":function(userId){
+					// debugger
+					var url=serverUrl+"/user_info/selectById?id="+userId
+					axios.get(url).then(function(response){
+						var info=response.data.data
+						this.vue.info=info
+						console.log(info.userName)
+					}).catch(function(e){
+						window.alert("联网出错了")
+					})
+				}
+			},
+			"mounted":function(){
+				// debugger
+				var id = location.search.split("=")[1]
+				if(id == null){
+					window.alert("请先登录！")
+					location.href("login.html")
+				}
+				else{
+					this.userId=location.search.split("=")[1]
+					console.log(this.userId)
+					this.getUserLaunchTeam(this.userId)
+					this.getUserJoinTeam(this.userId)
+					this.getUserInfo(this.userId)
+				}
+			},
+		}
+		var vue = new Vue(config)
+	</script>
+</html>
