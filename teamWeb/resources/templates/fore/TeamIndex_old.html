@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<!--使用X-UA-Compatible来设置IE浏览器兼容模式 最新的渲染模式-->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<!--
+       viewport表示用户是否可以缩放页面；
+       width指定视区的逻辑宽度；
+       device-width指示视区宽度应为设备的屏幕宽度；
+       initial-scale指令用于设置Web页面的初始缩放比例
+       initial-scale=1则将显示未经缩放的Web文档
+    -->
+		<title>Title</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<!-- 引入 Bootstrap -->
+		<link href="../../css/bootstrap/3.4.1/bootstrap.css" rel="stylesheet">
+		<!-- jQuery (Bootstrap 的 JavaScript 插件需要引入 jQuery) -->
+		<script src="https://code.jquery.com/jquery.js"></script>
+
+		<style>
+			.paddtop{
+            padding-top: 10px;
+        }
+        .search-btn{
+            float: left;
+            border:1px solid #ffc900;
+            width: 90px;
+            height: 35px;
+            background-color:#ffc900 ;
+            text-align: center;
+            line-height: 35px;
+            margin-top: 15px;
+        }
+
+        .search-input{
+            float: left;
+            border:2px solid #ffc900;
+            width: 400px;
+            height: 35px;
+            padding-left: 5px;
+            margin-top: 15px;
+        }
+        .jx{
+            border-bottom: 2px solid #ffc900;
+            padding: 5px;
+        }
+        .company{
+            height: 40px;
+            background-color: #ffc900;
+            text-align: center;
+            line-height:40px ;
+            font-size: 8px;
+        }
+    </style>
+	</head>
+	<body>
+		<div id="bg" class="jumbotron jumbotron-fluid">
+			<div class="container">
+				<h1>崴崴？来组队！</h1>
+			</div>
+		</div>
+		<div id="app" align="center">
+			<header class="container">
+				<!--轮播图-->
+				<span class="input-group-btn">
+					<button class="btn btn-primary btn-block" type="button" v-on:click="mainIndex">主界面</button>
+				</span>
+				<span class="input-group-btn">
+					<button class="btn btn-primary btn-block" type="button" v-on:click="personalRoom">个人主页</button>
+				</span>
+				<span class="input-group-btn">
+					<button class="btn btn-primary btn-block" type="button" v-on:click="personalMessage">个人通知</button>
+				</span>
+				<div class="row">
+					<div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+						<!-- Indicators -->
+						<ol class="carousel-indicators">
+							<li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+							<li data-target="#carousel-example-generic" data-slide-to="1"></li>
+							<li data-target="#carousel-example-generic" data-slide-to="2"></li>
+						</ol>
+
+						<!-- Wrapper for slides -->
+						<div class="carousel-inner" role="listbox">
+							<div class="item active">
+								<img src="../../img/1.jpg" height=300 width=300 alt="...">
+							</div>
+							<div class="item">
+								<img src="../../img/2.jpg" height=300 width=300 alt="...">
+							</div>
+							<div class="item">
+								<img src="../../img/3.jpg" height=300 width=300 alt="...">
+							</div>
+
+						</div>
+
+						<!-- Controls -->
+						<a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+							<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+							<span class="sr-only">Previous</span>
+						</a>
+						<a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+							<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+							<span class="sr-only">Next</span>
+						</a>
+					</div>
+				</div>
+			</header>
+			<h2 class="text-primary" aligen="center">分类</h2>
+			<ul class="nav nav-tabs nav-justified">
+				<li><a href="#" v-on:click="selectAllTeam()">全部</a></li>
+				<li><a href="#" v-on:click="selectByCategoryId(1)">竞赛</a></li>
+				<li><a href="#" v-on:click="selectByCategoryId(2)">体育</a></li>
+				<li><a href="#" v-on:click="selectByCategoryId(3)">文艺</a></li>
+				<li><a href="#" v-on:click="selectByCategoryId(4)">出游</a></li>
+				<li><a href="#" v-on:click="selectByCategoryId(5)">拼车</a></li>
+				<li><a href="#" v-on:click="selectByCategoryId(6)">合租</a></li>
+			</ul>
+			<br>
+			<div class="container" align="center">
+				<div align="center" class="col-lg-10">
+					<div class="input-group">
+						<input type="text" id="input1" class="form-control" placeholder="请输入组队活动的名称" v-model="FuzzyName">
+						<span class="input-group-btn">
+							<button class="btn btn-primary btn-block" type="button" v-on:click="selectFuzzily(FuzzyName)">Go!</button>
+						</span>
+						<span class="input-group-btn">
+							<button class="btn btn-primary btn-block" type="button">+ 发起组队</button>
+						</span>
+					</div><!-- /input-group -->
+
+				</div><!-- /.col-lg-6 -->
+			</div>
+			<br>
+			<div>
+				<table class="table">
+					<caption></caption>
+					<thead>
+						<tr class="active">
+							<th>活动编号</th>
+							<th>活动名称</th>
+							<th>活动分类</th>
+							<th>活动状态</th>
+							<th>负责人</th>
+							<th>活动图片</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="team in teamList" class="success">
+							<td>{{team.teamId}}</td>
+							<!-- <td><a v-bind:href="'TeamDetail.html?teamId='+team.teamId">{{team.activityName}}</a></td> -->
+							<td><a v-on:click="teamDetail(team.teamId)">{{team.activityName}}</a></td>
+							<td>{{team.categoryName}}</td>
+							<td v-if="team.activityState == '0'">未开始</td>
+							<td v-if="team.activityState == '1'">进行中</td>
+							<td v-if="team.activityState == '2'">已结束</td>
+							<td>{{team.userName}}</td>
+						</tr>
+					</tbody>
+			</div>
+			<br>
+		</div>
+
+		<!-- 包括所有已编译的插件 -->
+	</body>
+	<script src="../../js/bootstrap/bootstrap.js"></script>
+	<script src="../../js/vue.js"></script>
+	<script src="../../js/axios.min.js"></script>
+	<script src="../../js/const.js"></script>
+	<script>
+		var config = {
+			"el": "#app",
+			"data": {
+				"teamList": [],
+				"categoryList": [],
+				"FuzzyName": "",
+			},
+			"methods": {
+				"selectAllTeam": function() {
+					var url = serverUrl + "/team/selectAll"
+					axios.get(url)
+						.then(function(response) {
+							console.log(response.data)
+							var serverResult = response.data
+							var list = serverResult.data
+							this.vue.teamList = list
+
+						})
+						.catch(function(e) {
+							console.log(e)
+							window.alert("联网出错了！")
+						})
+				},
+				"selectByCategoryId": function(id) {
+					var url = serverUrl + "/team/selectByCategoryId?categoryId=" + id
+					axios.get(url)
+						.then(function(response) {
+							console.log(response)
+							var serverResult = response.data
+							var list = serverResult.data
+							this.vue.teamList = list;
+						}).catch(function(e) {
+							console.log(e)
+							window.alert("联网出错了！")
+						})
+				},
+				"selectFuzzily": function(str) {
+					var url = serverUrl + "/team/selectFuzzily?str=" + str
+
+					axios.get(url)
+						.then(function(response) {
+							console.log(response)
+							var serverResult = response.data
+							var list = serverResult.data
+							this.vue.teamList = list;
+							console.log(this.vue.teamList)
+						}).catch(function(e) {
+							console.log(e)
+							window.alert("联网出错了！")
+						})
+
+				},
+				"mainIndex": function() {
+					this.selectAllTeam()
+				},
+				"personalRoom": function() {
+					var p = location.search.split("=")[1]
+					console.log(p)
+					if (p == null) {
+						window.alert("请先登录，即将前往登录界面！")
+						location.href = "login.html"
+					} else {
+						location.href = "UserInfo.html?userId=" + p
+					}
+				},
+				"personalMessage":function(){
+					var p = location.search.split("=")[1]
+					console.log(p)
+					if (p == null) {
+						window.alert("请先登录，即将前往登录界面！")
+						location.href = "login.html"
+					} else {
+						location.href = "message.html?receiveUserId=" + p
+					}
+				},
+				"teamDetail":function(teamId){
+					var p = location.search.split("=")[1]
+					console.log(p)
+					if (p == null) {
+						location.href = "TeamDetail.html?teamId="+teamId
+					} else {
+						location.href = "TeamDetail.html?teamId="+teamId+"&userId="+p
+					}
+				}
+			},
+			"mounted": function() {
+				var url1 = serverUrl + "/team/selectAll"
+				axios.get(url1)
+					.then(function(response) {
+						console.log(response.data)
+						var serverResult = response.data
+						var list = serverResult.data
+						this.vue.teamList = list
+
+					})
+					.catch(function(e) {
+						console.log(e)
+						window.alert("联网出错了！")
+					})
+
+				var url2 = serverUrl + "/team_category/selectAll"
+				axios.get(url2)
+					.then(function(response) {
+						var serverResult = response.data
+						var list = serverResult.data
+						this.vue.categoryList = list
+						console.log(this.vue.categoryList)
+
+					})
+					.catch(function(e) {
+						console.log(e)
+						window.alert("联网出错了！")
+					})
+
+			}
+		}
+		var vue = new Vue(config)
+	</script>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+		<title>用户登录</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<!-- 引入 Bootstrap -->
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+		<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+	</head>
+	<body>
+		<div id="bg" class="jumbotron jumbotron-fluid">
+			<div class="container" algin="center">
+				<h1>登录崴崴来组队</h1>
+			</div>
+		</div>
+		<div id="app" align="center">
+			<div class="row" style="margin-top:30px;">
+				<div class="col-md-6" style="border-right:1px solid #ddd;">
+				<div class="well col-md-10">
+				<h3>用户登录</h3>
+				<div class="input-group input-group-md">
+					<span class="input-group-addon" id="sizing-addon1"><i class="glyphicon glyphicon-user" aria-hidden="true"></i></span>
+					<input type="text" v-model="name" class="form-control" placeholder="用户名" aria-describedby="sizing-addon1">
+				</div>
+				<br>
+				<div class="input-group input-group-md">
+					<span class="input-group-addon" id="sizing-addon1"><i class="glyphicon glyphicon-lock"></i></span>
+					<input type="password" v-model="password" class="form-control" placeholder="密码" aria-describedby="sizing-addon1">
+				</div>
+				<!--
+				<div class="well well-sm" style="text-align:center;">
+					<input type="radio" name="kind" value="tea"> 用户
+					<input type="radio" name="kind" value="stu"> 管理员
+				</div>
+				-->
+				<br>
+				<button type="submit" class="btn btn-success btn-block" v-on:click="login">
+					登录
+				</button>
+				<br>
+				<a href="register.html">
+					<button type="submit" class="btn btn-primary btn-block">
+						注册
+					</button>
+				</a>
+				</div>
+				</div>
+					<div class="col-md-6"> 
+						<h3>
+							欢迎使用崴崴来组队！
+						</h3>
+						<ul>
+							<!-- <li><em>我草你妈个大笔</em></li> -->
+							<li><em>软件工程实训</em></li>
+						</ul>
+					</div>
+				</div>
+	</div>
+	</div>
+	</body>
+	
+
+
+<!---->
+<!---->	
+
+		<!-- jQuery (Bootstrap 的 JavaScript 插件需要引入 jQuery) -->
+		<script src="https://code.jquery.com/jquery.js"></script>
+		<!-- 包括所有已编译的插件 -->
+		<script src="../../js/bootstrap/bootstrap.js"></script>
+		<script src="../../js/vue.js"></script>
+		<script src="../../js/axios.min.js"></script>
+		<script src="../../js/const.js"></script>
+		<script>
+			axios.defaults.withCredentials=true;
+			var config={
+				"el":"#app",
+				"data":{
+					"name":"",
+					"password":""
+				},
+				"methods":{
+					"login":function(){
+						var url = serverUrl+"/user/login?"+
+						"userAccount="+this.name+
+						"&userPassword="+this.password
+						
+						axios({
+							method:"get",
+							url:url,
+							widthCredentials: true
+						})
+						.then(function(response){
+							console.log(response.data)
+							if(response.data.state == 0){
+								window.alert(response.data.msg)
+								location.href="TeamIndex.html?id="+response.data.data
+							}
+							else{
+								window.alert("登陆失败，请检查用户名或密码！")
+							}
+							
+						})
+						.catch(function(e){
+							console.log(e)
+							window.alert("联网出错了！")
+						})
+					}
+				},
+				"mounted":function(){
+					// console.log(location.search)
+					var p = location.search.split("&")[1]
+					console.log(p)
+					if(p != null)
+					{
+						// console.log(p[0].split("="))
+						// console.log(p[1].split("="))
+						this.name = location.search.split("&")[0].split("=")[1]
+						this.password = location.search.split("&")[1].split("=")[1]
+					}
+					
+				}
+			}
+			var vue = new Vue(config)
+		</script>
+	</body>
+</html>

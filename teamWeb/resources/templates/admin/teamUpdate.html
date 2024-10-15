@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<head>
+		<title>修改组队信息</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+		<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+		<style>
+		    #bg {
+		        background-image: url("../../img/1.jpg");
+		        background-size: cover;
+		    }
+		    #end {
+		        font-size: 18px;
+		        text-align: center;
+		        background-color: darkgray;
+		    }
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div id="bg" class="jumbotron jumbotron-fluid">
+				
+			    <div class="container">
+			        <h1>修改组队信息</h1>
+			    </div>
+			</div>
+			活动名:<input v-model="activityName"><br>
+			组长：<input v-model="userId"><br>
+			分类：<select v-model="selectedCategoryId">
+				<option v-for="category in categoryList" v-bind:value="category.categoryId">
+					{{category.categoryName}}
+				</option>
+			</select>
+			<br>
+			活动图片：<input v-model="activityImage"><br>
+			活动状态：<input v-model="activityState"><br>
+			活动描述：<input v-model="activityDescription"><br>
+			总人数：<input v-model="totalNum"><br>
+			剩余人数：<input v-model="remainNum"><br>
+			开始时间：<input v-model="startTime"><br>
+			截止时间：<input v-model="endTime"><br>
+			招募要求：<input v-model="request"><br>
+			是否需要审核：<input v-model="examine"><br>
+			<br>
+			<button v-on:click="update">修改</button>
+		</div>
+	</body>
+	<script src="../../js/vue.js"></script>
+	<script src="../../js/axios.min.js"></script>
+	<script src="../../js/const.js"></script>
+	<script>
+		var config = {
+			"el": "#app",
+			"data": {
+				"categoryList": [],
+				"selectedCategoryId":1,
+				"id": "",
+				"activityName": "",
+				"userId": "",
+				"activityImage": "default.png",
+				"activityState": "",
+				"activityDescription": "",
+				"totalNum": "",
+				"remainNum": "",
+				"startTime": "",
+				"endTime": "",
+				"request": "",
+				"examine": ""
+			},
+			"methods": {
+				"update": function() {
+					var url = serverUrl + "/team/update" +
+						"?teamId=" + this.id +
+						"&activityName=" + this.activityName +
+						"&userId=" + this.userId +
+						"&categoryId=" + this.selectedCategoryId +
+						"&activityImage=" + this.activityImage +
+						"&activityState=" + this.activityState + 
+						"&activityDescription=" + this.activityDescription + 
+						"&totalNum=" + this.totalNum +
+						"&remainNum=" + this.remainNum + 
+						"&startTime=" + this.startTime +
+						"&endTime=" +this.endTime +
+						"&request" + this.request +
+						"&examine=" + this.examine
+					axios.get(url).then(function(response) {
+						window.alert(response.data.msg)
+						//让浏览器显示teamAdmin.html
+						//locatin是地址栏,href是网址
+						location.href = "teamAdmin.html"
+					}).catch()
+				},
+				"selectById": function() {
+					var url = serverUrl + "/team/selectById?id=" + this.id
+					console.log(url)
+					axios.get(url).then(function(response) {
+						this.vue.activityName = response.data.data.activityName
+						this.vue.userId = response.data.data.userId
+						this.vue.activityImage = response.data.data.activityImage
+						this.vue.activityState = response.data.data.activityState
+						this.vue.activityDescription = response.data.data.activityDescription
+						this.vue.totalNum = response.data.data.totalNum
+						this.vue.remainNum = response.data.data.remainNum
+						this.vue.startTime = response.data.data.startTime
+						this.vue.endTime = response.data.data.endTime
+						this.vue.request = response.data.data.request
+						this.vue.examine = response.data.data.examine
+					}).catch()
+				},
+				"selectCategory": function() {
+					var url = serverUrl + "/team_category/selectAll"
+					axios.get(url).then(function(response) {
+						this.vue.categoryList = response.data.data
+					}).catch()
+				}
+			},
+			"mounted": function() {
+				//userAdmin中单击修改按钮
+				//userUpdate.html?id=3
+				debugger
+				var p = location.search //?id=3
+				var array = p.split("=") //[0]=?id [1]=3
+				var id = array[1]
+				this.id = id
+				this.selectCategory()
+				this.selectById()
+			}
+		}
+		var vue = new Vue(config)
+	</script>
+</html>

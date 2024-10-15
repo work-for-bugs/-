@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+	
+	<head>
+		<title>用户管理</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+		<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+		<style>
+		    #bg {
+		        background-image: url("../../img/1.jpg");
+		        background-size: cover;
+		    }
+		    #end {
+		        font-size: 18px;
+		        text-align: center;
+		        background-color: darkgray;
+		    }
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div id="bg" class="jumbotron jumbotron-fluid">
+				
+			    <div class="container">
+			        <h1>用户管理</h1>
+			    </div>
+			</div>
+			
+			<br>
+			账号:<input v-model="userAccount"><br>
+			密码:<input v-model="userPassword"><br>
+			<button v-on:click="insert">添加</button>
+			
+			<table border="2">
+				<tr>
+					<td>编号</td>
+					<td>账号</td>
+					<td>密码</td>
+					<td>修改</td>
+					<td>删除</td>
+				</tr>
+				<tr v-for="user in userList">
+					<td>{{user.userId}}</td>
+					<td>{{user.userAccount}}</td>
+					<td>{{user.userPassword}}</td>
+					<td><button v-on:click="update(user.userId)">修改</button></td>
+					<td><button v-on:click="remove(user.userId)">删除</button></td>
+				</tr>
+			</table>
+		</div>
+	</body>
+	<script src="../../js/vue.js"></script>
+	<script src="../../js/axios.min.js"></script>
+	<script src="../../js/const.js"></script>
+	<script type="text/javascript">
+		var config = {
+			"el": "#app",
+			"data": {
+				"userList": [],
+				"userAccount":"",
+				"userPassword":""
+			},
+			"methods": {
+				"selectAll": function() {
+					var url = serverUrl + "/user/selectAll"
+					axios.get(url).then(function(response) {
+						this.vue.userList = response.data.data
+					}).catch()
+				},
+				"update": function(id) {
+					location.href = "userUpdate.html?id=" + id
+				},
+				"remove": function(id) {
+					var url = serverUrl + "/user/delete?id=" + id
+					console.log(url)
+					axios.get(url).then(function(response) {
+						window.alert(response.data.msg)
+						//重新查询所有用户，自动更新界面
+						this.vue.selectAll()
+					}).catch()
+				},
+				"insert":function(){
+					var url=serverUrl+"/user/register"
+					+"?userAccount="+this.userAccount
+					+"&userPassword="+this.userPassword
+					axios.get(url)
+					.then(function(response){
+						window.alert(response.data.msg)
+						this.vue.selectAll()//重新查询,界面会自动更新  then里面用this.vue
+					})
+					.catch()
+				}
+			},
+			"mounted": function() {
+				//查询所有user
+				this.selectAll()
+			}
+		}
+		var vue = new Vue(config)
+	</script>
+</html>

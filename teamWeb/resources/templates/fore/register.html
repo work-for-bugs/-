@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>用户注册</title>
+				<!-- 引入 Bootstrap -->
+				<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+				<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+				<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+				<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+	</head>
+	<body>
+		<div id="bg" class="jumbotron jumbotron-fluid">
+			<div class="container" algin="center">
+				<h1>注册崴崴来组队</h1>
+			</div>
+		</div>
+		<div id="app" align="center">
+			<div class="row" style="margin-top:30px;">
+				<div class="col-md-6" style="border-right:1px solid #ddd;">
+				<div class="well col-md-10">
+				<h3>用户登录</h3>
+				<div class="input-group input-group-md">
+					<span class="input-group-addon" id="sizing-addon1"><i class="glyphicon glyphicon-user" aria-hidden="true"></i></span>
+					<input type="text" v-model="name" class="form-control" placeholder="用户名" aria-describedby="sizing-addon1">
+				</div>		
+				<br>
+		
+				<div class="input-group input-group-md">
+					<span class="input-group-addon" id="sizing-addon1"><i class="glyphicon glyphicon-user" aria-hidden="true"></i></span>
+					<input type="password" v-model="password" class="form-control" placeholder="密码" aria-describedby="sizing-addon1">
+				</div>
+				<br>
+
+				<div class="input-group input-group-md">
+					<span class="input-group-addon" id="sizing-addon1"><i class="glyphicon glyphicon-lock"></i></span>
+					<input type="password" v-model="passwordValid" class="form-control" placeholder="确认密码" aria-describedby="sizing-addon1">
+				</div>
+				<br>
+				<button type="submit" class="btn btn-primary btn-block" v-on:click="register">
+					注册
+				</button>
+				<br>
+				<a href="login.html">
+					<button type="submit" class="btn btn-success btn-block">
+						已有账号？点击登录
+					</button>
+				</a>
+				<br>
+				</div>
+				</div>
+				<div class="col-md-6">
+					<h3>
+						欢迎使用崴崴来组队！
+					</h3>
+					<ul>
+						<li><em>在这里进行注册</em></li>
+					</ul>
+				</div>
+				</div>
+		</div>
+		</div>
+	</body>
+	<script src="../../js/vue.js"></script>
+	<script src="../../js/axios.min.js"></script>
+	<script src="../../js/const.js"></script>
+	<script>
+		var config = {
+			"el": "#app",
+			"data": {
+				"name": "",
+				"password": "",
+				"passwordValid":""
+			},
+			"methods": {
+				"register": function() {
+					if(this.password == this.passwordValid){
+						var url = serverUrl + "/user/register?" +
+							"userAccount=" + this.name +
+							"&userPassword=" + this.password
+						console.log(url)
+						axios.get(url)
+							.then(function(response) {
+								console.log(response.data)
+								
+								if(response.data.state == 0){
+									window.alert("注册成功，即将跳转到登录界面！")
+									
+									location.href = "login.html?name="+
+									this.vue.name + "&password=" + this.vue.password
+								}
+								else{
+									window.alert(response.data.data)
+								}
+								
+							})
+							.catch(function(e) {
+								console.log(e)
+								window.alert("联网出错了！")
+							})
+					}
+					else{
+						window.alert("验证密码与密码不同，请重新输入！")
+					}
+				}
+			}
+		}
+		var vue = new Vue(config)
+	</script>
+</html>

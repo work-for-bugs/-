@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<head>
+		<title>组队信息管理</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+		<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+		<style>
+		    #bg {
+		        background-image: url("../../img/1.jpg");
+		        background-size: cover;
+		    }
+		    #end {
+		        font-size: 18px;
+		        text-align: center;
+		        background-color: darkgray;
+		    }
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div id="bg" class="jumbotron jumbotron-fluid">
+				
+			    <div class="container">
+			        <h1>组队信息管理</h1>
+			    </div>
+			</div>
+			活动名:<input v-model="activityName"><br>
+			组长：<input v-model="userId"><br>
+			分类：<select v-model="selectedCategoryId">
+				<option v-for="category in categoryList" v-bind:value="category.categoryId">
+					{{category.categoryName}}
+				</option>
+			</select>
+			<br>
+			活动图片：<input v-model="activityImage"><br>
+			活动状态：<input v-model="activityState"><br>
+			活动描述：<input v-model="activityDescription"><br>
+			总人数：<input v-model="totalNum"><br>
+			剩余人数：<input v-model="remainNum"><br>
+			开始时间：<input v-model="startTime"><br>
+			截止时间：<input v-model="endTime"><br>
+			招募要求：<input v-model="request"><br>
+			是否需要审核：<input v-model="examine"><br>
+
+			<button v-on:click="insert">添加</button>
+
+			<table border="2">
+				<tr>
+					<td>编号</td>
+					<td>活动名</td>
+					<td>组长</td>
+					<td>组长名</td>
+					<td>活动图片</td>
+					<td>活动状态</td>
+					<td>活动描述</td>
+					<td>总人数</td>
+					<td>剩余人数</td>
+					<td>开始时间</td>
+					<td>截止时间</td>
+					<td>招募要求</td>
+					<td>是否需要审核</td>
+					<td>修改</td>
+					<td>删除</td>
+				</tr>
+				<tr v-for="team in teamList">
+					<td>{{team.teamId}}</td>
+					<td>{{team.activityName}}</td>
+					<td>{{team.userId}}</td>
+					<td>{{team.userName}}</td>
+					<td>{{team.activityImage}}</td>
+					<td>{{team.activityState}}</td>
+					<td>{{team.activityDescription}}</td>
+					<td>{{team.totalNum}}</td>
+					<td>{{team.remainNum}}</td>
+					<td>{{team.startTime}}</td>
+					<td>{{team.endTime}}</td>
+					<td>{{team.request}}</td>
+					<td>{{team.examine}}</td>
+					<td><button v-on:click="update(team.teamId)">修改</button></td>
+					<td><button v-on:click="remove(team.teamId)">删除</button></td>
+				</tr>
+			</table>
+		</div>
+	</body>
+	<script src="../../js/vue.js"></script>
+	<script src="../../js/axios.min.js"></script>
+	<script src="../../js/const.js"></script>
+	<script type="text/javascript">
+		var config = {
+			"el": "#app",
+			"data": {
+				"teamList": [],
+				"categoryList": [],
+				"selectedCategoryId": 1,
+				"id": "",
+				"activityName": "",
+				"userId": "",
+				"activityImage": "default.png",
+				"activityState": "",
+				"activityDescription": "",
+				"totalNum": "",
+				"remainNum": "",
+				"startTime": "",
+				"endTime": "",
+				"request": "",
+				"examine": ""
+			},
+			"methods": {
+				"selectCategory": function() {
+					var url = serverUrl + "/team_category/selectAll"
+					axios.get(url).then(function(response) {
+						this.vue.categoryList = response.data.data
+					}).catch()
+				},
+				"selectAll": function() {
+					var url = serverUrl + "/team/selectAll"
+					axios.get(url).then(function(response) {
+						this.vue.teamList = response.data.data
+					}).catch()
+				},
+				"update": function(id) {
+					location.href = "teamUpdate.html?id=" + id
+				},
+				"remove": function(id) {
+					var url = serverUrl + "/team/delete?id=" + id
+					console.log(url)
+					axios.get(url).then(function(response) {
+						window.alert(response.data.msg)
+						//重新查询所有用户，自动更新界面
+						this.vue.selectAll()
+					}).catch()
+				},
+				"insert": function() {
+					var url = serverUrl + "/team/insert" +
+						"?activityName=" + this.activityName +
+						"&userId=" + this.userId +
+						"&categoryId=" + this.selectedCategoryId +
+						"&activityImage=" + this.activityImage +
+						"&activityState=" + this.activityState + 
+						"&activityDescription=" + this.activityDescription + 
+						"&totalNum=" + this.totalNum +
+						"&remainNum=" + this.remainNum + 
+						"&startTime=" + this.startTime +
+						"&endTime=" +this.endTime +
+						"&request" + this.request +
+						"&examine=" + this.examine			
+					axios.get(url)
+						.then(function(response) {
+							window.alert(response.data.msg)
+							this.vue.selectAll() //重新查询,界面会自动更新  then里面用this.vue
+						})
+						.catch()
+				}
+			},
+			"mounted": function() {
+				this.selectCategory()
+
+				//查询所有team
+				this.selectAll()
+			}
+		}
+		var vue = new Vue(config)
+	</script>
+</html>

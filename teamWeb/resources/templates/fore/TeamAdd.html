@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加活动</title>
+        <!-- 引入 Bootstrap -->
+        <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+        <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+        <script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1>Hey! Team ME!</h1>
+        </div>
+    </div>
+    <div id="app" class="container">
+    <div class="container">
+    	<div class="btn-group btn-group-lg">
+    		<button type="button" class="btn btn-primary" v-on:click="mainIndex">主界面</button>
+    		<button type="button" class="btn btn-primary" v-on:click="personalRoom">个人主页</button>
+    		<button type="button" class="btn btn-primary" v-on:click="personalMessage">个人通知</button>
+    	</div class="btn-group">
+    </div>
+    <br>
+    <br>
+    
+    <h2 class="text-primary">发起活动</h2>
+    <br>
+    <hr>
+    <br>
+    <div class="row">
+        <div class="col-md-4">
+            <img src="../../img/2.jpg" class="rounded-circle img-fluid">
+        </div>
+        <div class="col-md-5">
+            <h3>活动名称：</h3>
+            <br>
+            <input v-model="activityName" type="text" class="form-control" placeholder="请输入活动名称"/>
+            <br>        
+            <hr>
+            <h3>活动描述：</h3>
+            <br>
+            <input v-model="activityDesc" type="text" class="form-control" placeholder="请输入活动描述"/>
+            <br>         
+        </div>
+    </div>
+    <br>
+	<hr>
+	<br>
+	<h2 class="text-primary">活动信息</h2>
+	<br>
+	<hr>
+	<br>
+    <h3>开始时间：</h3>
+    <br>
+    <input v-model="startTime" type="text" class="form-control" placeholder="请输入开始时间"/>
+    <br>        
+    <h3>结束时间：</h3>
+    <br>
+    <input v-model="endTime" type="text" class="form-control" placeholder="请输入结束时间"/>
+    <br>   
+    <h3>总人数：</h3>
+    <br>
+    <input v-model="totalNum" type="text" class="form-control" placeholder="请输入总人数"/>
+    <br>  
+    <h3>剩余人数：</h3>
+    <br>
+    <input v-model="remainNum" type="text" class="form-control" placeholder="请输入剩余需要的人数"/>
+    <br>  
+    <h3>分类：</h3>
+    <br>
+    <select class="form-control" v-model="selectedCategoryId">
+        <option v-for="category in categoryList"
+        v-bind:value=category.categoryId>
+        {{category.categoryName}}
+        </option>    
+    </select>
+    <br>       
+    <h3>活动状态：</h3>
+    <br>
+    <select class="form-control" v-model="selectedState">
+        <option v-for="state in stateList" v-bind:value="state.key">{{state.value}}</option>
+    </select>
+    <br>
+    <h3>是否需要审核：</h3>
+    <br>
+    <select class="form-control" v-model="selectedCheck">
+        <option v-for="check in checkList" v-bind:value="check.key">{{check.value}}</option>
+    </select>
+    <br>
+    <h3>活动需求：</h3>
+    <br>
+    <input v-model="request" type="text" class="form-control" placeholder="请输入活动要求"/>
+    <br>  
+    <br>
+    <hr>
+    <br>
+    <div align="center">
+        <button type="button" class="btn btn-success btn-lg" v-on:click="insert">确认发布</button>
+    </div>
+    <footer id="end" class="mt-3 p-3">
+        <p class="text-black"></p>
+    </footer>
+</div>
+</body>
+<script src="../../js/vue.js"></script>
+<script src="../../js/axios.min.js"></script>
+<script src="../../js/const.js"></script>
+<script>
+    var config= {
+        "el": "#app",
+        "data": {
+            "currentUserId":"",
+            "selectedCategoryId":"0",
+            "selectedCheck":"0",
+            "selectedState":"0",
+            "activityName":"",
+            "activityDesc": "",
+            "request":"",
+            "startTime":"",
+            "endTime":"",
+            "totalNum":"",
+            "remainNum":"",
+            "categoryList":[],
+            "checkList":[{
+                    "key":"0",
+                    "value":"不需要审核"
+                },
+                {
+                    "key":"1",
+                    "value":"需要审核"
+                }],
+            "stateList":[{
+                     "key":"0",
+                     "value":"未开始"
+                 },
+                {
+                    "key":"1",
+                    "value":"已开始"
+                },
+                {
+                    "key":"2",
+                    "value":"已结束"
+                }]
+
+        },
+        "methods":{
+            "insert":function(){
+                var url = serverUrl+"/team/insert?"
+                +"activityDescription="+this.activityDesc
+                +"&activityName="+this.activityName
+                +"&activityState="+this.selectedState
+                +"&categoryId="+this.selectedCategoryId
+                +"&startTime="+this.startTime
+                +"&endTime="+this.endTime
+                +"&totalNum="+this.totalNum
+                +"&remainNum="+this.remainNum
+                +"&request="+this.request
+                +"&examine="+this.selectedCheck
+                +"&userId="+this.currentUserId
+                +"&activityImage="+"../../img/1.jpg"
+				console.log(url)
+				axios.get(url)
+				.then(function(response){
+					if(response.data.state == 0)
+					{
+						window.alert("添加成功")
+					}
+				})
+				.catch()
+
+            },
+			"mainIndex": function() {
+				var p = location.search.split("=")[1]
+				console.log(p)
+				if (p == null) {
+					// window.alert("请先登录，即将前往登录界面！")
+					location.href = "TeamIndex.html"
+				} else {
+					location.href = "TeamIndex.html?id="+p;
+				}
+			},
+			"personalRoom": function() {
+				var p = location.search.split("=")[1]
+				console.log(p)
+				if (p == null) {
+					window.alert("请先登录，即将前往登录界面！")
+					location.href = "login.html"
+				} else {
+					location.href = "UserInfo.html?userId=" + p
+				}
+			},
+			"personalMessage":function(){
+				var p = location.search.split("=")[1]
+				console.log(p)
+				if (p == null) {
+					window.alert("请先登录，即将前往登录界面！")
+					location.href = "login.html"
+				} else {
+					location.href = "message.html?receiveUserId=" + p
+				}
+			}
+        },
+        "mounted":function (){
+            var p=location.search//?id=1
+            var array=p.split("=")//[0]=?id [1]=1
+            var currentUserId=array[1]
+            this.currentUserId=currentUserId
+
+            var url = serverUrl+"/team_category/selectAll"
+            axios.get(url)
+                .then(function(response){
+                    var list=response.data.data
+                    this.vue.categoryList=list
+                })
+                .catch()
+        }
+    }
+
+    var vue = new Vue(config)
+</script>
+</html>

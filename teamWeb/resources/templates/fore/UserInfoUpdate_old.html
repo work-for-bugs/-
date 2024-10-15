@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>UserInfo</title>
+		<!-- 引入 Bootstrap -->
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+		<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+		<style>
+			#bg {
+                background-image: url("images/head.jpg");
+                background-size: cover;
+            }
+            #end {
+                font-size: 18px;
+                text-align: center;
+                background-color: darkgray;
+            }
+        </style>
+	</head>
+	<body>
+
+		<div id="bg" class="jumbotron jumbotron-fluid">
+			<div class="container">
+				<h1>崴崴？来组队！</h1>
+			</div>
+		</div>
+		<div id="app" class="container">
+			<span class="input-group-btn">
+				<button class="btn btn-primary btn-block" type="button" v-on:click="mainIndex">主界面</button>
+			</span>
+			<span class="input-group-btn">
+				<button class="btn btn-primary btn-block" type="button" v-on:click="personalRoom">个人主页</button>
+			</span>
+			<span class="input-group-btn">
+				<button class="btn btn-primary btn-block" type="button" v-on:click="personalMessage">个人通知</button>
+			</span>
+			<h2 class="text-primary">修改信息</h2>
+			<br>
+			<hr>
+			<br>
+			<div class="row">
+				<div class="col-md-4">
+					<img src="../../img/2.jpg" class="rounded-circle img-fluid">
+				</div>
+				<div class="col-md-5">
+					<h3>姓名：</h3>
+					<br>
+					<input v-model="userInfo.userName" type="text" class="form-control" id="name" value="">
+					<br>
+					<hr>
+					<h3>个性签名：</h3>
+					<br>
+					<input v-model="userInfo.signature" type="text" class="form-control" id="name" placeholder="这个人很懒，什么都没有留下~">
+				</div>
+			</div>
+			<br>
+			<hr>
+			<br>
+			<h2 class="text-primary">基本信息</h2>
+			<br>
+			<hr>
+			<br>
+			<div class="col-md-20">
+				<div class="col-md-12">
+					<h3>性别：</h3>
+					<br>
+					<div class="radio">
+						<label>
+							<input v-model="userInfo.gender" type="radio" name="optionsRadios" id="optionsRadios1" value="男" checked> 男
+						</label>
+					</div>
+					<div class="radio">
+						<label>
+							<input v-model="userInfo.gender" type="radio" name="optionsRadios" id="optionsRadios2" value="女"> 女
+						</label>
+					</div>
+					<br>
+					<hr>
+					<h3>年龄：</h3>
+					<br>
+					<input v-model="userInfo.age" type="text" class="form-control" id="name" placeholder="这个人很懒，什么都没有留下~">
+					<br>
+					<hr>
+					<h3>个人描述：</h3>
+					<br>
+					<textarea v-model="userInfo.userDescription" class="form-control" rows="6"></textarea>
+				</div>
+				<br>
+				<hr>
+				<br>
+			</div>
+			<div align="center">
+				<button type="button" class="btn btn-success btn-lg" v-on:click="updateUserInfo">确认修改</button>
+			</div>
+		</div>
+
+		<footer id="end" class="mt-3 p-3">
+			<p class="text-white">我草你吗隔壁的软件实训，两天精通vue <a href="interface.html">返回首页</a></p>
+		</footer>
+
+	</body>
+	<script src="../../js/vue.js"></script>
+	<script src="../../js/axios.min.js"></script>
+	<script src="../../js/const.js"></script>
+	<script type="text/javascript">
+		var config = {
+			"el": "#app",
+			"data": {
+				"userInfo": [],
+				"userId": 0
+			},
+			"methods": {
+				"getUserInfo": function(userId) {
+					var url = serverUrl + "/user_info/selectById?id=" + userId
+					axios.get(url).then(function(response) {
+						var info = response.data.data
+						this.vue.userInfo = info
+						console.log(info.userName)
+					}).catch(function(e) {
+						window.alert("联网出错了")
+					})
+				},
+				"updateUserInfo":function(){
+					if(optionsRadios1.checked == true){
+						var gender = "男"
+					}
+					else if(optionsRadios2.checked == true){
+						var gender = "女"
+					}
+					var url = serverUrl + "/user_info/update"+
+					"?userId="+this.userId+
+					"&userName="+this.userInfo.userName+
+					"&age="+this.userInfo.age+
+					"&gender="+gender
+					"&signature="+this.userInfo.signature+
+					"&userDescription="+this.userInfo.userDescription
+					console.log(url)
+					axios.get(url).then(function(response) {
+						window.alert(response.data.msg)
+					}).catch(function(e) {
+						window.alert("联网出错了")
+					})
+				},
+				"mainIndex": function() {
+					var p = location.search.split("=")[1]
+					console.log(p)
+					if (p == null) {
+						// window.alert("请先登录，即将前往登录界面！")
+						location.href = "TeamIndex.html"
+					} else {
+						location.href = "TeamIndex.html?id="+p;
+					}
+				},
+				"personalRoom": function() {
+					var p = location.search.split("=")[1]
+					console.log(p)
+					if (p == null) {
+						window.alert("请先登录，即将前往登录界面！")
+						location.href = "login.html"
+					} else {
+						location.href = "UserInfo.html?userId=" + p
+					}
+				},
+				"personalMessage":function(){
+					var p = location.search.split("=")[1]
+					console.log(p)
+					if (p == null) {
+						window.alert("请先登录，即将前往登录界面！")
+						location.href = "login.html"
+					} else {
+						location.href = "message.html?receiveUserId=" + p
+					}
+				}
+			},
+			"mounted": function() {
+				var id = location.search.split("=")[1]
+				if (id == null) {
+					window.alert("请先登录！")
+					location.href("login.html")
+				} else {
+					this.userId = location.search.split("=")[1]
+					console.log(this.userId)
+					this.getUserInfo(this.userId)
+				}
+			},
+		}
+		var vue = new Vue(config)
+	</script>
+</html>

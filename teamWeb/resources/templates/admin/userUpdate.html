@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<head>
+		<title>用户管理</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+		<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+		<script src="https://cdn.staticfile.org/popper.js/1.12.5/umd/popper.min.js"></script>
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+		<style>
+		    #bg {
+		        background-image: url("../../img/1.jpg");
+		        background-size: cover;
+		    }
+		    #end {
+		        font-size: 18px;
+		        text-align: center;
+		        background-color: darkgray;
+		    }
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div id="bg" class="jumbotron jumbotron-fluid">
+				
+			    <div class="container">
+			        <h1>用户管理</h1>
+			    </div>
+			</div>
+			账号：<input v-model="userAccount"><br>
+			密码：<input v-model="userPassword"><br>
+			<button v-on:click="update">修改</button>
+		</div>
+	</body>
+	<script src="../../js/vue.js"></script>
+	<script src="../../js/axios.min.js"></script>
+	<script src="../../js/const.js"></script>
+	<script>
+		var config = {
+			"el": "#app",
+			"data": {
+				"id": "",
+				"userAccount": "",
+				"userPassword": ""
+			},
+			"methods": {
+				"update": function() {
+					var url = serverUrl + "/user/update" +
+						"?userId=" + this.id +
+						"&userAccount=" + this.userAccount +
+						"&userPassword=" + this.userPassword
+					axios.get(url).then(function(response) {
+						window.alert(response.data.msg)
+						//让浏览器显示userAdmin.html
+						//locatin是地址栏,href是网址
+						location.href = "userAdmin.html"
+					}).catch()
+				},
+				"selectById": function() {
+					var url = serverUrl + "/user/getUserById?id=" + this.id
+					console.log(url)
+					axios.get(url).then(function(response) {
+						this.vue.userAccount = response.data.data.userAccount
+						this.vue.userPassword = response.data.data.userPassword
+						console.log(this.vue.userAccount)
+					}).catch()
+				}
+			},
+			"mounted": function() {
+				//userAdmin中单击修改按钮
+				//userUpdate.html?id=3
+				debugger
+				var p = location.search //?id=3
+				var array = p.split("=") //[0]=?id [1]=3
+				var id = array[1]
+				this.id = id
+				this.selectById()
+			}
+		}
+		var vue = new Vue(config)
+	</script>
+</html>
